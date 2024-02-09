@@ -1,9 +1,20 @@
+using Microsoft.EntityFrameworkCore;
+using SaballutsWeather.DbModels;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+builder.Services.AddHealthChecks().AddDbContextCheck<SaballutsWeatherContext>();
+
+builder.Services.AddDbContext<SaballutsWeatherContext>(options=>{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SaballutsWeatherConnection"));
+});
+
 
 var app = builder.Build();
 
@@ -15,6 +26,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapHealthChecks("/healthz");
 
 
 app.Run();
